@@ -3,7 +3,7 @@ import { ReactNode, ButtonHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'> {
   children: ReactNode;
   variant?: 'default' | 'outline' | 'ghost' | 'link';
   size?: 'default' | 'sm' | 'lg' | 'icon';
@@ -41,8 +41,7 @@ export const Button = ({
   };
 
   return (
-    <motion.button
-      whileTap={{ scale: withRipple && !isDisabled ? 0.97 : 1 }}
+    <button
       className={cn(
         'inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
         variants[variant],
@@ -80,7 +79,7 @@ export const Button = ({
       ) : (
         children
       )}
-    </motion.button>
+    </button>
   );
 };
 
