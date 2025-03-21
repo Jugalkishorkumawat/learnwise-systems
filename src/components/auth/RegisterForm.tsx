@@ -2,9 +2,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '../ui-custom/Button';
+import { Button } from '@/components/ui-custom/Button';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Check, X } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<'student' | 'staff'>('student');
   const { toast } = useToast();
+  const { register } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -37,15 +39,21 @@ const RegisterForm = () => {
     
     setIsLoading(true);
     
-    // Simulate API request
-    setTimeout(() => {
+    try {
+      await register(formData.name, formData.email, formData.password, userType);
       toast({
         title: "Account created!",
         description: `Registered as ${userType}: ${formData.name}`,
       });
+    } catch (error) {
+      toast({
+        title: "Registration failed",
+        description: "There was an error creating your account. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-      // Add actual registration logic here
-    }, 1500);
+    }
   };
 
   // Password strength indicators

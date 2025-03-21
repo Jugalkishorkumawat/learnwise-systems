@@ -10,6 +10,7 @@ interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'dis
   withRipple?: boolean;
   loading?: boolean;
   className?: string;
+  disabled?: boolean;
 }
 
 export const Button = ({

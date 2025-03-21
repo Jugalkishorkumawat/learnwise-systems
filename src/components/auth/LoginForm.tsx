@@ -2,9 +2,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '../ui-custom/Button';
+import { Button } from '@/components/ui-custom/Button';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -13,20 +14,27 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<'student' | 'staff'>('student');
   const { toast } = useToast();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API request
-    setTimeout(() => {
+    try {
+      await login(email, password, userType);
       toast({
         title: "Success!",
         description: `Logged in as ${userType} with email: ${email}`,
       });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Invalid credentials. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-      // Add actual login logic here
-    }, 1500);
+    }
   };
 
   return (
