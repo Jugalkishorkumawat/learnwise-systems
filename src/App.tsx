@@ -21,6 +21,16 @@ import Courses from "./pages/courses/Courses";
 import Grades from "./pages/grades/Grades";
 import StudentPayments from "./pages/payments/StudentPayments";
 
+// Teacher Pages
+import ManageAttendance from "./pages/attendance/ManageAttendance";
+import Students from "./pages/students/Students";
+import StudentProfile from "./pages/students/StudentProfile";
+import Payments from "./pages/payments/Payments";
+import Facilities from "./pages/facilities/Facilities";
+
+// Shared Pages
+import Chatbot from "./pages/chatbot/Chatbot";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -43,6 +53,16 @@ const App = () => (
               <Route path="/courses" element={<Courses />} />
               <Route path="/grades" element={<Grades />} />
               <Route path="/payments/student" element={<StudentPayments />} />
+              
+              {/* Teacher/Admin Routes */}
+              <Route path="/attendance/manage" element={<ManageAttendance />} />
+              <Route path="/students" element={<Students />} />
+              <Route path="/students/:id" element={<StudentProfile />} />
+              <Route path="/payments" element={<Payments />} />
+              <Route path="/facilities" element={<Facilities />} />
+              
+              {/* Shared Routes */}
+              <Route path="/chatbot" element={<Chatbot />} />
               
               {/* Catch All */}
               <Route path="*" element={<NotFound />} />
