@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -12,13 +13,17 @@ import {
   MessageSquare, 
   Camera, 
   Settings,
-  LogOut
+  LogOut,
+  BookOpen,
+  Calendar,
+  GraduationCap
 } from 'lucide-react';
 
 interface SidebarItem {
   icon: React.ReactNode;
   label: string;
   href: string;
+  roles?: Array<'student' | 'staff' | 'admin'>;
 }
 
 interface SidebarProps {
@@ -29,23 +34,32 @@ const Sidebar = ({ className }: SidebarProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
   const location = useLocation();
+  const { logout, userRole } = useAuth();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const adminItems: SidebarItem[] = [
-    { icon: <Home size={20} />, label: 'Dashboard', href: '/dashboard' },
-    { icon: <Camera size={20} />, label: 'Attendance', href: '/attendance' },
-    { icon: <User size={20} />, label: 'Students', href: '/students' },
-    { icon: <CreditCard size={20} />, label: 'Payments', href: '/payments' },
-    { icon: <Building2 size={20} />, label: 'Facilities', href: '/facilities' },
-    { icon: <MessageSquare size={20} />, label: 'Chatbot', href: '/chatbot' },
+  const sidebarItems: SidebarItem[] = [
+    { icon: <Home size={20} />, label: 'Dashboard', href: '/dashboard', roles: ['student', 'staff', 'admin'] },
+    { icon: <Calendar size={20} />, label: 'My Attendance', href: '/attendance/view', roles: ['student'] },
+    { icon: <BookOpen size={20} />, label: 'My Courses', href: '/courses', roles: ['student'] },
+    { icon: <GraduationCap size={20} />, label: 'My Grades', href: '/grades', roles: ['student'] },
+    { icon: <CreditCard size={20} />, label: 'My Payments', href: '/payments/student', roles: ['student'] },
+    { icon: <Camera size={20} />, label: 'Attendance', href: '/attendance/manage', roles: ['staff', 'admin'] },
+    { icon: <User size={20} />, label: 'Students', href: '/students', roles: ['staff', 'admin'] },
+    { icon: <CreditCard size={20} />, label: 'Payments', href: '/payments', roles: ['admin'] },
+    { icon: <Building2 size={20} />, label: 'Facilities', href: '/facilities', roles: ['staff', 'admin'] },
+    { icon: <MessageSquare size={20} />, label: 'Chatbot', href: '/chatbot', roles: ['student', 'staff', 'admin'] },
   ];
 
   const secondaryItems: SidebarItem[] = [
-    { icon: <Settings size={20} />, label: 'Settings', href: '/settings' },
+    { icon: <Settings size={20} />, label: 'Settings', href: '/settings', roles: ['student', 'staff', 'admin'] },
   ];
+
+  // Filter items based on user role
+  const filteredMainItems = sidebarItems.filter(item => !item.roles || item.roles.includes(userRole as any));
+  const filteredSecondaryItems = secondaryItems.filter(item => !item.roles || item.roles.includes(userRole as any));
 
   if (!mounted) return null;
 
@@ -63,7 +77,7 @@ const Sidebar = ({ className }: SidebarProps) => {
         <div>
           {/* Main Navigation */}
           <nav className="space-y-1 px-2">
-            {adminItems.map((item) => (
+            {filteredMainItems.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
@@ -99,7 +113,7 @@ const Sidebar = ({ className }: SidebarProps) => {
         <div className="space-y-2 px-2">
           {/* Secondary Navigation */}
           <nav className="space-y-1">
-            {secondaryItems.map((item) => (
+            {filteredSecondaryItems.map((item) => (
               <Link
                 key={item.href}
                 to={item.href}
@@ -138,7 +152,7 @@ const Sidebar = ({ className }: SidebarProps) => {
                 'transition-all duration-200',
                 collapsed ? 'justify-center' : 'justify-start'
               )}
-              onClick={() => console.log('Logout clicked')}
+              onClick={logout}
             >
               <div className={cn(
                 'flex items-center',
