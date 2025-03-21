@@ -1,15 +1,16 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui-custom/Button';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Link } from 'react-router-dom';
 import PasswordStrengthIndicator from './PasswordStrengthIndicator';
 import UserTypeSelector from './UserTypeSelector';
+import PasswordInput from './PasswordInput';
+import AuthFooter from './AuthFooter';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -19,7 +20,6 @@ const RegisterForm = () => {
     confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<'student' | 'staff'>('student');
   const { toast } = useToast();
   const { register } = useAuth();
@@ -119,20 +119,12 @@ const RegisterForm = () => {
             <Input
               id="password"
               name="password"
-              type={showPassword ? 'text' : 'password'}
+              type="password"
               value={formData.password}
               onChange={handleChange}
               placeholder="Create a password"
               required
             />
-            <button 
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-              aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
           </div>
           
           {/* Password strength indicators */}
@@ -147,7 +139,7 @@ const RegisterForm = () => {
           <Input
             id="confirmPassword"
             name="confirmPassword"
-            type={showPassword ? 'text' : 'password'}
+            type="password"
             value={formData.confirmPassword}
             onChange={handleChange}
             placeholder="Confirm your password"
@@ -188,12 +180,11 @@ const RegisterForm = () => {
         </Button>
 
         {/* Sign In Link */}
-        <div className="text-center text-sm">
-          <span className="text-muted-foreground">Already have an account?{' '}</span>
-          <Link to="/login" className="font-medium text-primary hover:underline underline-offset-4">
-            Sign in
-          </Link>
-        </div>
+        <AuthFooter 
+          text="Already have an account?" 
+          linkText="Sign in" 
+          linkPath="/login" 
+        />
       </form>
     </motion.div>
   );
