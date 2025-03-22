@@ -82,6 +82,69 @@ export const FaceRecognitionService = {
       console.error('Error initializing face recognition system:', error);
       return false;
     }
+  },
+
+  /**
+   * Register a new face to the recognition system
+   * @param studentId The ID of the student
+   * @param name The name of the student
+   * @param imageData Base64 encoded image data
+   * @returns Promise<boolean> indicating success or failure
+   */
+  registerFace: async (studentId: string, name: string, imageData: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${FACE_RECOGNITION_API_URL}/register_face`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          student_id: studentId,
+          name: name,
+          image_data: imageData,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to register face');
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error registering face:', error);
+      toast({
+        title: "Registration Error",
+        description: "Failed to register face. Please try again.",
+        variant: "destructive"
+      });
+      return false;
+    }
+  },
+
+  /**
+   * Export attendance data to CSV
+   * @param date The date for which to export attendance
+   * @returns Promise<string> URL to download the CSV file
+   */
+  exportAttendanceData: async (date: string): Promise<string> => {
+    try {
+      const response = await fetch(`${FACE_RECOGNITION_API_URL}/export_attendance?date=${date}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to export attendance data');
+      }
+      
+      const blob = await response.blob();
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.error('Error exporting attendance data:', error);
+      toast({
+        title: "Export Error",
+        description: "Failed to export attendance data. Please try again.",
+        variant: "destructive"
+      });
+      return '';
+    }
   }
 };
 
