@@ -17,10 +17,6 @@ import {
   Filter,
   Download,
   UserCog,
-  Video,
-  Settings,
-  AlertCircle,
-  CheckCircle
 } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,8 +28,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+
+// Import our new components
+import CameraFeed from '@/components/attendance/CameraFeed';
+import FaceRecognitionConfig from '@/components/attendance/FaceRecognitionConfig';
 
 // Mock student data for attendance management
 const students = [
@@ -89,8 +87,7 @@ const ManageAttendance = () => {
     });
   };
   
-  const toggleAutoAttendance = () => {
-    const newStatus = !autoAttendance;
+  const toggleAutoAttendance = (newStatus: boolean) => {
     setAutoAttendance(newStatus);
     
     if (newStatus) {
@@ -99,14 +96,6 @@ const ManageAttendance = () => {
         title: "Automated Attendance System Activated",
         description: "The system is now monitoring for student attendance.",
       });
-      // Simulate system status changes
-      setTimeout(() => {
-        setSystemStatus('idle');
-        toast({
-          title: "Students Detected",
-          description: "3 students have been automatically recognized and marked present.",
-        });
-      }, 5000);
     } else {
       setSystemStatus('idle');
       toast({
@@ -114,32 +103,6 @@ const ManageAttendance = () => {
         description: "Switched to manual attendance marking.",
       });
     }
-  };
-  
-  const handleSystemError = () => {
-    setSystemStatus('error');
-    toast({
-      title: "System Error",
-      description: "Face recognition system encountered an error. Please check the camera connection.",
-      variant: "destructive"
-    });
-  };
-  
-  const handleSystemRestart = () => {
-    setSystemStatus('scanning');
-    toast({
-      title: "System Restarting",
-      description: "Face recognition system is being restarted...",
-    });
-    
-    // Simulate system restart
-    setTimeout(() => {
-      setSystemStatus('idle');
-      toast({
-        title: "System Restarted",
-        description: "Face recognition system is now operational.",
-      });
-    }, 3000);
   };
   
   const courses = Array.from(new Set(students.map(student => student.course)));
@@ -166,96 +129,20 @@ const ManageAttendance = () => {
             </div>
             
             {/* Automated Attendance System Card */}
-            <Card className="mb-6">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center">
-                  <Video className="mr-2 h-5 w-5 text-primary" />
-                  Automated Attendance System
-                </CardTitle>
-                <CardDescription>
-                  Use face recognition to automatically mark student attendance
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="flex flex-col space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="auto-attendance" className="flex items-center space-x-2">
-                        <span>Automatic Attendance</span>
-                      </Label>
-                      <Switch 
-                        id="auto-attendance" 
-                        checked={autoAttendance} 
-                        onCheckedChange={toggleAutoAttendance}
-                      />
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {autoAttendance 
-                        ? "System is actively monitoring for student faces" 
-                        : "Manual attendance mode is enabled"}
-                    </p>
-                  </div>
-                  
-                  <div className="flex flex-col space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-medium">System Status:</span>
-                      {systemStatus === 'idle' && (
-                        <Badge className="bg-green-100 text-green-800">
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Operational
-                        </Badge>
-                      )}
-                      {systemStatus === 'scanning' && (
-                        <Badge className="bg-blue-100 text-blue-800">
-                          <Video className="h-3 w-3 mr-1" />
-                          Scanning
-                        </Badge>
-                      )}
-                      {systemStatus === 'error' && (
-                        <Badge className="bg-red-100 text-red-800">
-                          <AlertCircle className="h-3 w-3 mr-1" />
-                          Error
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {systemStatus === 'idle' 
-                        ? "All systems are functioning properly" 
-                        : systemStatus === 'scanning'
-                        ? "Actively detecting and recognizing students"
-                        : "System needs attention - check camera connection"}
-                    </p>
-                  </div>
-                  
-                  <div className="flex space-x-2 items-center">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleSystemError}
-                      className="h-9 px-4 w-1/2"
-                    >
-                      <Settings className="h-4 w-4 mr-2" />
-                      Configure
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleSystemRestart}
-                      className="h-9 px-4 w-1/2"
-                      disabled={systemStatus !== 'error'}
-                    >
-                      <AlertCircle className="h-4 w-4 mr-2" />
-                      {systemStatus === 'error' ? 'Restart System' : 'Test System'}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter className="bg-secondary/50 text-sm text-muted-foreground px-6 py-3">
-                <p>
-                  Face recognition attendance is active in 4 classrooms. 28 students were automatically marked present today.
-                </p>
-              </CardFooter>
-            </Card>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              <div className="lg:col-span-2">
+                <CameraFeed 
+                  isActive={autoAttendance}
+                  onStatusChange={setSystemStatus}
+                />
+              </div>
+              <div>
+                <FaceRecognitionConfig
+                  isEnabled={autoAttendance}
+                  onToggle={toggleAutoAttendance}
+                />
+              </div>
+            </div>
             
             <Tabs defaultValue="daily" value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="mb-6">
