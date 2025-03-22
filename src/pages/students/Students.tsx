@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '@/components/layout/Sidebar';
 import PageTransition from '@/components/layout/PageTransition';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui-custom/Card';
@@ -42,6 +43,7 @@ const students = [
 const Students = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('all');
+  const navigate = useNavigate();
   
   // Filter students based on search query and selected department
   const filteredStudents = students.filter(student => 
@@ -178,7 +180,7 @@ const Students = () => {
                               <Button 
                                 size="sm" 
                                 variant="outline"
-                                onClick={() => window.location.href = `/students/${student.id}`}
+                                onClick={() => navigate(`/students/${student.id}`)}
                                 className="h-8 px-3 text-xs"
                               >
                                 <FileText className="h-3 w-3 mr-1" />
@@ -187,7 +189,7 @@ const Students = () => {
                               <Button 
                                 size="sm" 
                                 variant="outline"
-                                onClick={() => window.location.href = `/students/${student.id}/edit`}
+                                onClick={() => navigate(`/students/${student.id}/edit`)}
                                 className="h-8 px-3 text-xs"
                               >
                                 <ExternalLink className="h-3 w-3" />
