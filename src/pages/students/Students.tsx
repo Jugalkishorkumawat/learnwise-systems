@@ -67,7 +67,7 @@ const Students = () => {
                 <p className="text-muted-foreground">Manage student profiles and data</p>
               </div>
               
-              <Button>
+              <Button onClick={() => navigate('/students/add')}>
                 <UserPlus className="mr-2 h-4 w-4" />
                 Add New Student
               </Button>
