@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,44 +35,46 @@ import Chatbot from "./pages/chatbot/Chatbot";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <AnimatePresence mode="wait">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              
-              {/* Student Routes */}
-              <Route path="/attendance/view" element={<ViewAttendance />} />
-              <Route path="/attendance/mark" element={<MarkAttendance />} />
-              <Route path="/courses" element={<Courses />} />
-              <Route path="/grades" element={<Grades />} />
-              <Route path="/payments/student" element={<StudentPayments />} />
-              
-              {/* Teacher/Admin Routes */}
-              <Route path="/attendance/manage" element={<ManageAttendance />} />
-              <Route path="/students" element={<Students />} />
-              <Route path="/students/:id" element={<StudentProfile />} />
-              <Route path="/payments" element={<Payments />} />
-              <Route path="/facilities" element={<Facilities />} />
-              
-              {/* Shared Routes */}
-              <Route path="/chatbot" element={<Chatbot />} />
-              
-              {/* Catch All */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AnimatePresence>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <AnimatePresence mode="wait">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                
+                {/* Student Routes */}
+                <Route path="/attendance/view" element={<ViewAttendance />} />
+                <Route path="/attendance/mark" element={<MarkAttendance />} />
+                <Route path="/courses" element={<Courses />} />
+                <Route path="/grades" element={<Grades />} />
+                <Route path="/payments/student" element={<StudentPayments />} />
+                
+                {/* Teacher/Admin Routes */}
+                <Route path="/attendance/manage" element={<ManageAttendance />} />
+                <Route path="/students" element={<Students />} />
+                <Route path="/students/:id" element={<StudentProfile />} />
+                <Route path="/payments" element={<Payments />} />
+                <Route path="/facilities" element={<Facilities />} />
+                
+                {/* Shared Routes */}
+                <Route path="/chatbot" element={<Chatbot />} />
+                
+                {/* Catch All */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AnimatePresence>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;
