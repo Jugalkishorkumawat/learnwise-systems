@@ -1,9 +1,10 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import Sidebar from '@/components/layout/Sidebar';
 import PageTransition from '@/components/layout/PageTransition';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui-custom/Card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui-custom/Card';
 import { Input } from "@/components/ui/input";
 import { Button } from '@/components/ui-custom/Button';
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +16,11 @@ import {
   Clock, 
   Filter,
   Download,
-  UserCog
+  UserCog,
+  Video,
+  Settings,
+  AlertCircle,
+  CheckCircle
 } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -27,6 +32,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 // Mock student data for attendance management
 const students = [
@@ -43,27 +50,30 @@ const students = [
 // Daily attendance records
 const dailyAttendance = [
   { id: '1', date: '2023-11-15', courseId: '1', courseName: 'Introduction to Computer Science', students: [
-    { id: '1', name: 'John Doe', studentId: 'ST2023001', status: 'present' },
-    { id: '3', name: 'Michael Brown', studentId: 'ST2023003', status: 'absent' },
+    { id: '1', name: 'John Doe', studentId: 'ST2023001', status: 'present', verificationMethod: 'face' },
+    { id: '3', name: 'Michael Brown', studentId: 'ST2023003', status: 'absent', verificationMethod: 'manual' },
   ]},
   { id: '2', date: '2023-11-15', courseId: '2', courseName: 'Data Structures', students: [
-    { id: '2', name: 'Sarah Johnson', studentId: 'ST2023002', status: 'present' },
-    { id: '6', name: 'Olivia Martin', studentId: 'ST2023006', status: 'present' },
+    { id: '2', name: 'Sarah Johnson', studentId: 'ST2023002', status: 'present', verificationMethod: 'face' },
+    { id: '6', name: 'Olivia Martin', studentId: 'ST2023006', status: 'present', verificationMethod: 'manual' },
   ]},
   { id: '3', date: '2023-11-15', courseId: '3', courseName: 'Calculus I', students: [
-    { id: '4', name: 'Emily Davis', studentId: 'ST2023004', status: 'late' },
-    { id: '7', name: 'William Thompson', studentId: 'ST2023007', status: 'present' },
+    { id: '4', name: 'Emily Davis', studentId: 'ST2023004', status: 'late', verificationMethod: 'face' },
+    { id: '7', name: 'William Thompson', studentId: 'ST2023007', status: 'present', verificationMethod: 'manual' },
   ]},
   { id: '4', date: '2023-11-15', courseId: '4', courseName: 'English Composition', students: [
-    { id: '5', name: 'James Wilson', studentId: 'ST2023005', status: 'absent' },
-    { id: '8', name: 'Sophia Garcia', studentId: 'ST2023008', status: 'present' },
+    { id: '5', name: 'James Wilson', studentId: 'ST2023005', status: 'absent', verificationMethod: 'manual' },
+    { id: '8', name: 'Sophia Garcia', studentId: 'ST2023008', status: 'present', verificationMethod: 'face' },
   ]},
 ];
 
 const ManageAttendance = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('daily');
   const [selectedCourse, setSelectedCourse] = useState('all');
+  const [autoAttendance, setAutoAttendance] = useState(true);
+  const [systemStatus, setSystemStatus] = useState<'idle' | 'scanning' | 'error'>('idle');
   
   // Filter students based on search query and selected course
   const filteredStudents = students.filter(student => 
@@ -77,6 +87,59 @@ const ManageAttendance = () => {
       title: "Attendance Marked",
       description: `Student ${studentId} has been marked as ${status}.`,
     });
+  };
+  
+  const toggleAutoAttendance = () => {
+    const newStatus = !autoAttendance;
+    setAutoAttendance(newStatus);
+    
+    if (newStatus) {
+      setSystemStatus('scanning');
+      toast({
+        title: "Automated Attendance System Activated",
+        description: "The system is now monitoring for student attendance.",
+      });
+      // Simulate system status changes
+      setTimeout(() => {
+        setSystemStatus('idle');
+        toast({
+          title: "Students Detected",
+          description: "3 students have been automatically recognized and marked present.",
+        });
+      }, 5000);
+    } else {
+      setSystemStatus('idle');
+      toast({
+        title: "Automated Attendance System Deactivated",
+        description: "Switched to manual attendance marking.",
+      });
+    }
+  };
+  
+  const handleSystemError = () => {
+    setSystemStatus('error');
+    toast({
+      title: "System Error",
+      description: "Face recognition system encountered an error. Please check the camera connection.",
+      variant: "destructive"
+    });
+  };
+  
+  const handleSystemRestart = () => {
+    setSystemStatus('scanning');
+    toast({
+      title: "System Restarting",
+      description: "Face recognition system is being restarted...",
+    });
+    
+    // Simulate system restart
+    setTimeout(() => {
+      setSystemStatus('idle');
+      toast({
+        title: "System Restarted",
+        description: "Face recognition system is now operational.",
+      });
+    }, 3000);
   };
   
   const courses = Array.from(new Set(students.map(student => student.course)));
@@ -102,48 +165,140 @@ const ManageAttendance = () => {
               </div>
             </div>
             
+            {/* Automated Attendance System Card */}
+            <Card className="mb-6">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center">
+                  <Video className="mr-2 h-5 w-5 text-primary" />
+                  Automated Attendance System
+                </CardTitle>
+                <CardDescription>
+                  Use face recognition to automatically mark student attendance
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="auto-attendance" className="flex items-center space-x-2">
+                        <span>Automatic Attendance</span>
+                      </Label>
+                      <Switch 
+                        id="auto-attendance" 
+                        checked={autoAttendance} 
+                        onCheckedChange={toggleAutoAttendance}
+                      />
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {autoAttendance 
+                        ? "System is actively monitoring for student faces" 
+                        : "Manual attendance mode is enabled"}
+                    </p>
+                  </div>
+                  
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium">System Status:</span>
+                      {systemStatus === 'idle' && (
+                        <Badge className="bg-green-100 text-green-800">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Operational
+                        </Badge>
+                      )}
+                      {systemStatus === 'scanning' && (
+                        <Badge className="bg-blue-100 text-blue-800">
+                          <Video className="h-3 w-3 mr-1" />
+                          Scanning
+                        </Badge>
+                      )}
+                      {systemStatus === 'error' && (
+                        <Badge className="bg-red-100 text-red-800">
+                          <AlertCircle className="h-3 w-3 mr-1" />
+                          Error
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {systemStatus === 'idle' 
+                        ? "All systems are functioning properly" 
+                        : systemStatus === 'scanning'
+                        ? "Actively detecting and recognizing students"
+                        : "System needs attention - check camera connection"}
+                    </p>
+                  </div>
+                  
+                  <div className="flex space-x-2 items-center">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleSystemError}
+                      className="h-9 px-4 w-1/2"
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      Configure
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleSystemRestart}
+                      className="h-9 px-4 w-1/2"
+                      disabled={systemStatus !== 'error'}
+                    >
+                      <AlertCircle className="h-4 w-4 mr-2" />
+                      {systemStatus === 'error' ? 'Restart System' : 'Test System'}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="bg-secondary/50 text-sm text-muted-foreground px-6 py-3">
+                <p>
+                  Face recognition attendance is active in 4 classrooms. 28 students were automatically marked present today.
+                </p>
+              </CardFooter>
+            </Card>
+            
             <Tabs defaultValue="daily" value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="mb-6">
                 <TabsTrigger value="daily">Daily Attendance</TabsTrigger>
                 <TabsTrigger value="report">Attendance Reports</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="daily">
-                <div className="mb-6 flex flex-col sm:flex-row gap-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search students..."
-                      className="pl-9"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    <select
-                      className="h-10 px-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                      value={selectedCourse}
-                      onChange={(e) => setSelectedCourse(e.target.value)}
-                    >
-                      <option value="all">All Courses</option>
-                      {courses.map(course => (
-                        <option key={course} value={course}>{course}</option>
-                      ))}
-                    </select>
-                    
-                    <Button variant="outline">
-                      <Filter className="mr-2 h-4 w-4" />
-                      Filters
-                    </Button>
-                    
-                    <Button variant="outline">
-                      <Download className="mr-2 h-4 w-4" />
-                      Export
-                    </Button>
-                  </div>
+              <div className="mb-6 flex flex-col sm:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search students..."
+                    className="pl-9"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
                 
+                <div className="flex gap-2">
+                  <select
+                    className="h-10 px-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    value={selectedCourse}
+                    onChange={(e) => setSelectedCourse(e.target.value)}
+                  >
+                    <option value="all">All Courses</option>
+                    {courses.map(course => (
+                      <option key={course} value={course}>{course}</option>
+                    ))}
+                  </select>
+                  
+                  <Button variant="outline">
+                    <Filter className="mr-2 h-4 w-4" />
+                    Filters
+                  </Button>
+                  
+                  <Button variant="outline">
+                    <Download className="mr-2 h-4 w-4" />
+                    Export
+                  </Button>
+                </div>
+              </div>
+              
+              <TabsContent value="daily">
                 <Card>
                   <CardHeader className="pb-1">
                     <CardTitle>Today's Attendance</CardTitle>
@@ -167,6 +322,7 @@ const ManageAttendance = () => {
                                 <TableHead>Student ID</TableHead>
                                 <TableHead>Name</TableHead>
                                 <TableHead>Status</TableHead>
+                                <TableHead>Verification</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                               </TableRow>
                             </TableHeader>
@@ -187,6 +343,17 @@ const ManageAttendance = () => {
                                       }
                                     >
                                       {student.status.charAt(0).toUpperCase() + student.status.slice(1)}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Badge 
+                                      variant="outline"
+                                      className={
+                                        student.verificationMethod === 'face' ? 'bg-blue-50 text-blue-800 border-blue-200' :
+                                        'bg-gray-50 text-gray-800 border-gray-200'
+                                      }
+                                    >
+                                      {student.verificationMethod === 'face' ? 'Face Recognition' : 'Manual Entry'}
                                     </Badge>
                                   </TableCell>
                                   <TableCell className="text-right">
@@ -276,7 +443,7 @@ const ManageAttendance = () => {
                                 <Button 
                                   size="sm" 
                                   variant="outline"
-                                  onClick={() => window.location.href = `/students/${student.id}`}
+                                  onClick={() => navigate(`/students/${student.id}`)}
                                   className="h-8 px-3 text-xs"
                                 >
                                   <UserCog className="h-3 w-3 mr-1" />

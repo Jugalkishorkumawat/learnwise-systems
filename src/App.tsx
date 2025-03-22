@@ -26,8 +26,14 @@ import StudentPayments from "./pages/payments/StudentPayments";
 import ManageAttendance from "./pages/attendance/ManageAttendance";
 import Students from "./pages/students/Students";
 import StudentProfile from "./pages/students/StudentProfile";
+import AddStudent from "./pages/students/AddStudent";
 import Payments from "./pages/payments/Payments";
 import Facilities from "./pages/facilities/Facilities";
+
+// Facility Management
+import Library from "./pages/facilities/Library";
+import Hostel from "./pages/facilities/Hostel";
+import ExamResults from "./pages/facilities/ExamResults";
 
 // Shared Pages
 import Chatbot from "./pages/chatbot/Chatbot";
@@ -59,9 +65,16 @@ const App = () => (
                 {/* Teacher/Admin Routes */}
                 <Route path="/attendance/manage" element={<ManageAttendance />} />
                 <Route path="/students" element={<Students />} />
+                <Route path="/students/add" element={<AddStudent />} />
                 <Route path="/students/:id" element={<StudentProfile />} />
+                <Route path="/students/:id/edit" element={<StudentProfile />} />
                 <Route path="/payments" element={<Payments />} />
+                
+                {/* Facility Management Routes */}
                 <Route path="/facilities" element={<Facilities />} />
+                <Route path="/facilities/library" element={<Library />} />
+                <Route path="/facilities/hostel" element={<Hostel />} />
+                <Route path="/facilities/exams" element={<ExamResults />} />
                 
                 {/* Shared Routes */}
                 <Route path="/chatbot" element={<Chatbot />} />

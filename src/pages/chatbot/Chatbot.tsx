@@ -1,161 +1,156 @@
 
 import { useState, useRef, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import Sidebar from '@/components/layout/Sidebar';
 import PageTransition from '@/components/layout/PageTransition';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui-custom/Card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui-custom/Card';
 import { Input } from "@/components/ui/input";
 import { Button } from '@/components/ui-custom/Button';
-import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
   Send, 
   Bot, 
   User, 
-  Image, 
-  Paperclip, 
-  Mic, 
-  ThumbsUp, 
+  Calendar, 
+  InfoIcon,
+  AlertCircle,
+  Lightbulb,
+  HelpCircle,
+  ExternalLink,
+  ThumbsUp,
   ThumbsDown,
-  Copy,
-  Bookmark
+  Clock,
+  X
 } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useAuth } from '@/contexts/AuthContext';
 
-// Define the message type
-interface Message {
-  id: string;
-  content: string;
-  sender: 'user' | 'bot';
-  timestamp: Date;
-}
-
-// Mock suggested questions
-const suggestedQuestions = [
-  "What's my attendance in Computer Science?",
-  "When is the next exam?",
-  "How do I apply for a scholarship?",
-  "What are the library hours?",
-  "How can I reset my student portal password?",
-  "What's the cafeteria menu today?",
+// Mock chatbot conversations
+const initialMessages = [
+  { id: '1', role: 'bot', content: 'Hello! I\'m your college assistant. How can I help you today?', timestamp: new Date().toISOString() },
 ];
+
+// Predefined quick questions
+const quickQuestions = [
+  { id: '1', text: 'What\'s my attendance in CS101?', category: 'attendance' },
+  { id: '2', text: 'When is the next exam?', category: 'exams' },
+  { id: '3', text: 'How do I pay my fees?', category: 'fees' },
+  { id: '4', text: 'Library opening hours?', category: 'facilities' },
+  { id: '5', text: 'How to access my grades?', category: 'grades' },
+  { id: '6', text: 'Report an issue with my hostel room', category: 'hostel' },
+];
+
+// Mock AI responses for demonstration
+const mockResponses: Record<string, string> = {
+  'attendance': 'Your current attendance in CS101 - Introduction to Computer Science is 85%. You need to maintain at least 75% attendance to be eligible for the final exam.',
+  'exams': 'The next exam is a Mid-Term scheduled for November 25, 2023. It covers units 1-3 of your syllabus.',
+  'fees': 'You can pay your fees online through the Student Portal or at the Accounts office. The deadline for the current semester is December 1, 2023.',
+  'library': 'The library is open from 8:00 AM to 10:00 PM on weekdays and 9:00 AM to 6:00 PM on weekends.',
+  'grades': 'You can access your grades by logging into the Student Portal and navigating to the "Academic Records" section.',
+  'help': 'I can help with questions about attendance, exams, grades, fee payment, library, hostel, and other campus facilities. Just ask away!'
+};
 
 const Chatbot = () => {
   const { user } = useAuth();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState(initialMessages);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [suggestedQuestions, setSuggestedQuestions] = useState<typeof quickQuestions>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  // Initial greeting from the bot
-  useEffect(() => {
-    const initialMessage: Message = {
-      id: '1',
-      content: `Hello ${user?.name || 'there'}! I'm EduBot, your virtual assistant. How can I help you today?`,
-      sender: 'bot',
-      timestamp: new Date(),
-    };
-    setMessages([initialMessage]);
-  }, [user]);
-  
-  // Scroll to bottom when messages change
-  useEffect(() => {
+  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
+  useEffect(() => {
+    scrollToBottom();
   }, [messages]);
   
-  const handleSendMessage = () => {
-    if (!input.trim()) return;
+  const handleSendMessage = (messageText: string = input) => {
+    if (!messageText.trim()) return;
     
     // Add user message
-    const userMessage: Message = {
+    const userMessage = {
       id: Date.now().toString(),
-      content: input,
-      sender: 'user',
-      timestamp: new Date(),
+      role: 'user',
+      content: messageText,
+      timestamp: new Date().toISOString()
     };
     
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsTyping(true);
+    setSuggestedQuestions([]);
     
-    // Simulate bot response after a short delay
+    // Simulate API delay
     setTimeout(() => {
-      const botResponses: Record<string, string> = {
-        "hi": `Hello ${user?.name || 'there'}! How can I assist you today?`,
-        "hello": `Hi ${user?.name || 'there'}! How can I help you?`,
-        "attendance": "Your overall attendance is 87%. You have been present for 35 out of 40 classes this semester.",
-        "exam": "Your next exam is the Mid-Term Exam scheduled on November 25, 2023.",
-        "scholarship": "To apply for a scholarship, visit the Financial Aid office or submit an application through the student portal by December 1st.",
-        "library": "The library is open Monday to Friday from 8:00 AM to 9:00 PM, and on weekends from 10:00 AM to 6:00 PM.",
-        "password": "To reset your password, go to the login page and click on 'Forgot Password'. Follow the instructions sent to your registered email.",
-        "cafeteria": "Today's cafeteria special is Vegetable Biryani with Raita. Regular menu items are also available.",
-        "thanks": "You're welcome! Feel free to ask if you need anything else.",
-        "thank you": "You're welcome! Is there anything else I can help you with?",
-      };
+      let responseMessage = '';
+      let suggestedFollow = [];
       
-      let botResponse = "I'm not sure how to answer that. Could you please provide more details or ask another question?";
-      
-      // Check if the input matches any key in botResponses
-      for (const key in botResponses) {
-        if (input.toLowerCase().includes(key)) {
-          botResponse = botResponses[key];
-          break;
-        }
+      // Simple keyword matching for demo purposes
+      if (messageText.toLowerCase().includes('attendance')) {
+        responseMessage = mockResponses.attendance;
+        suggestedFollow = quickQuestions.filter(q => q.category === 'attendance' || q.category === 'exams');
+      } else if (messageText.toLowerCase().includes('exam')) {
+        responseMessage = mockResponses.exams;
+        suggestedFollow = quickQuestions.filter(q => q.category === 'exams' || q.category === 'grades');
+      } else if (messageText.toLowerCase().includes('fee') || messageText.toLowerCase().includes('pay')) {
+        responseMessage = mockResponses.fees;
+        suggestedFollow = quickQuestions.filter(q => q.category === 'fees');
+      } else if (messageText.toLowerCase().includes('library')) {
+        responseMessage = mockResponses.library;
+        suggestedFollow = quickQuestions.filter(q => q.category === 'facilities');
+      } else if (messageText.toLowerCase().includes('grade')) {
+        responseMessage = mockResponses.grades;
+        suggestedFollow = quickQuestions.filter(q => q.category === 'grades');
+      } else if (messageText.toLowerCase().includes('hostel') || messageText.toLowerCase().includes('room')) {
+        responseMessage = 'To report an issue with your hostel room, please visit the Hostel Administration office or use the "Report Issue" feature in the Hostel Management section of the portal.';
+        suggestedFollow = quickQuestions.filter(q => q.category === 'hostel');
+      } else if (messageText.toLowerCase().includes('help')) {
+        responseMessage = mockResponses.help;
+        suggestedFollow = quickQuestions.slice(0, 3);
+      } else {
+        responseMessage = "I'm not sure I understand your question. Could you please rephrase or select from one of the suggested topics?";
+        suggestedFollow = quickQuestions.slice(0, 4);
       }
       
-      const botMessage: Message = {
-        id: Date.now().toString(),
-        content: botResponse,
-        sender: 'bot',
-        timestamp: new Date(),
+      const botResponse = {
+        id: (Date.now() + 1).toString(),
+        role: 'bot',
+        content: responseMessage,
+        timestamp: new Date().toISOString()
       };
       
-      setMessages(prev => [...prev, botMessage]);
+      setMessages(prev => [...prev, botResponse]);
       setIsTyping(false);
+      setSuggestedQuestions(suggestedFollow);
     }, 1500);
   };
   
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
   
-  const handleSuggestedQuestion = (question: string) => {
-    setInput(question);
-    // Focus on input after selecting a suggested question
-    const inputElement = document.getElementById('chat-input');
-    if (inputElement) {
-      inputElement.focus();
-    }
-  };
-  
-  const handleCopyMessage = (content: string) => {
-    navigator.clipboard.writeText(content);
+  const handleFeedback = (messageId: string, isPositive: boolean) => {
     toast({
-      title: "Message Copied",
-      description: "The message has been copied to your clipboard.",
+      title: isPositive ? "Feedback Received" : "We'll Improve",
+      description: isPositive 
+        ? "Thank you for your positive feedback!" 
+        : "Thanks for letting us know. We'll work on improving our responses.",
     });
   };
   
-  const handleSaveMessage = (content: string) => {
-    // In a real app, this would save to user's bookmarks
+  const clearChat = () => {
+    setMessages(initialMessages);
+    setSuggestedQuestions([]);
     toast({
-      title: "Message Saved",
-      description: "The message has been saved to your bookmarks.",
+      title: "Chat Cleared",
+      description: "All conversation history has been cleared.",
     });
-  };
-  
-  const formatMessageContent = (content: string) => {
-    // Simple formatting - could be expanded for more complex formatting
-    return content.split('\n').map((line, i) => (
-      <span key={i}>
-        {line}
-        {i < content.split('\n').length - 1 && <br />}
-      </span>
-    ));
   };
   
   return (
@@ -167,186 +162,223 @@ const Chatbot = () => {
           <main className="px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">EduBot</h1>
-                <p className="text-muted-foreground">Your personal AI assistant for campus queries</p>
+                <h1 className="text-2xl font-bold tracking-tight">AI College Assistant</h1>
+                <p className="text-muted-foreground">Get instant answers to your questions about college</p>
+              </div>
+              
+              <div className="mt-4 sm:mt-0">
+                <Button variant="outline" size="sm" onClick={clearChat}>
+                  <X className="mr-2 h-4 w-4" />
+                  Clear Chat
+                </Button>
               </div>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Chatbot Main Interface */}
-              <Card className="lg:col-span-3 overflow-hidden">
-                <CardHeader className="pb-4 border-b">
+              {/* Left Sidebar with suggested topics */}
+              <Card className="hidden lg:block lg:col-span-1 h-[calc(100vh-12rem)]">
+                <CardHeader>
+                  <CardTitle className="text-lg">Suggested Topics</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-sm font-medium mb-2 flex items-center">
+                        <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
+                        Academics
+                      </h3>
+                      <div className="space-y-2">
+                        <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => handleSendMessage("What's my attendance in CS101?")}>
+                          View my attendance
+                        </Button>
+                        <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => handleSendMessage("When is the next exam?")}>
+                          Exam schedule
+                        </Button>
+                        <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => handleSendMessage("How to access my grades?")}>
+                          Access my grades
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div>
+                      <h3 className="text-sm font-medium mb-2 flex items-center">
+                        <InfoIcon className="h-4 w-4 mr-1 text-muted-foreground" />
+                        Administrative
+                      </h3>
+                      <div className="space-y-2">
+                        <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => handleSendMessage("How do I pay my fees?")}>
+                          Fee payment
+                        </Button>
+                        <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => handleSendMessage("How to get a bonafide certificate?")}>
+                          Certificates
+                        </Button>
+                        <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => handleSendMessage("What's the procedure for applying for leave?")}>
+                          Leave application
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <Separator />
+                    
+                    <div>
+                      <h3 className="text-sm font-medium mb-2 flex items-center">
+                        <HelpCircle className="h-4 w-4 mr-1 text-muted-foreground" />
+                        Facilities
+                      </h3>
+                      <div className="space-y-2">
+                        <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => handleSendMessage("Library opening hours?")}>
+                          Library timings
+                        </Button>
+                        <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => handleSendMessage("Report an issue with my hostel room")}>
+                          Hostel support
+                        </Button>
+                        <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => handleSendMessage("How to book a sports facility?")}>
+                          Sports facilities
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Main Chat Interface */}
+              <Card className="lg:col-span-3 flex flex-col h-[calc(100vh-12rem)]">
+                <CardHeader className="pb-3">
                   <div className="flex items-center">
                     <Avatar className="h-10 w-10 mr-3">
                       <AvatarImage src="/placeholder.svg" />
-                      <AvatarFallback className="bg-primary/10 text-primary">
-                        <Bot className="h-6 w-6" />
+                      <AvatarFallback>
+                        <Bot className="h-5 w-5" />
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <CardTitle>EduBot</CardTitle>
-                      <CardDescription>AI Campus Assistant</CardDescription>
+                      <CardTitle>College Assistant</CardTitle>
+                      <CardDescription>
+                        <Badge className="bg-green-100 text-green-800" variant="outline">
+                          Online
+                        </Badge>
+                      </CardDescription>
                     </div>
-                    <Badge className="ml-auto bg-green-100 text-green-800">Online</Badge>
                   </div>
                 </CardHeader>
-                <div className="flex flex-col h-[500px]">
-                  <ScrollArea className="flex-1 p-4">
-                    <div className="space-y-4">
-                      {messages.map((message) => (
+                
+                <CardContent className="flex-grow overflow-y-auto pb-0">
+                  <div className="space-y-4">
+                    {messages.map((message) => (
+                      <div 
+                        key={message.id} 
+                        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
                         <div 
-                          key={message.id} 
-                          className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                          className={`max-w-[80%] rounded-lg p-3 ${
+                            message.role === 'user' 
+                              ? 'bg-primary text-primary-foreground ml-12' 
+                              : 'bg-secondary mr-12'
+                          }`}
                         >
-                          <div 
-                            className={`relative max-w-md p-4 rounded-lg ${
-                              message.sender === 'user' 
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-muted'
-                            }`}
-                          >
-                            <div className="flex items-start gap-3">
-                              {message.sender === 'bot' && (
-                                <Avatar className="h-8 w-8">
-                                  <AvatarFallback className="bg-primary/10 text-primary">
-                                    <Bot className="h-4 w-4" />
-                                  </AvatarFallback>
-                                </Avatar>
-                              )}
-                              
-                              <div className="space-y-2">
-                                <div className="text-sm">
-                                  {formatMessageContent(message.content)}
-                                </div>
-                                <div className={`text-xs ${message.sender === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
-                                  {message.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                </div>
-                              </div>
-                              
-                              {message.sender === 'user' && (
-                                <Avatar className="h-8 w-8">
-                                  <AvatarImage src={`https://ui-avatars.com/api/?name=${user?.name?.replace(/\s+/g, '+') || 'User'}&background=random`} />
-                                  <AvatarFallback>
-                                    <User className="h-4 w-4" />
-                                  </AvatarFallback>
-                                </Avatar>
-                              )}
-                            </div>
+                          <div className="flex items-start mb-1">
+                            {message.role === 'bot' && (
+                              <Avatar className="h-6 w-6 mr-2">
+                                <AvatarFallback>
+                                  <Bot className="h-3 w-3" />
+                                </AvatarFallback>
+                              </Avatar>
+                            )}
+                            <span className="text-xs font-medium">
+                              {message.role === 'user' ? `${user?.name || 'You'}` : 'AI Assistant'}
+                            </span>
+                          </div>
+                          <div className="mt-1">{message.content}</div>
+                          <div className="mt-2 flex justify-between items-center">
+                            <span className="text-xs opacity-70">
+                              <Clock className="h-3 w-3 inline mr-1" />
+                              {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
                             
-                            {message.sender === 'bot' && (
-                              <div className="absolute right-1 top-1 opacity-0 group-hover:opacity-100 flex space-x-1">
+                            {message.role === 'bot' && (
+                              <div className="flex space-x-1">
                                 <Button 
                                   variant="ghost" 
                                   size="sm" 
                                   className="h-6 w-6 p-0 rounded-full"
-                                  onClick={() => handleCopyMessage(message.content)}
+                                  onClick={() => handleFeedback(message.id, true)}
                                 >
-                                  <Copy className="h-3 w-3" />
-                                  <span className="sr-only">Copy</span>
+                                  <ThumbsUp className="h-3 w-3" />
                                 </Button>
                                 <Button 
                                   variant="ghost" 
                                   size="sm" 
                                   className="h-6 w-6 p-0 rounded-full"
-                                  onClick={() => handleSaveMessage(message.content)}
+                                  onClick={() => handleFeedback(message.id, false)}
                                 >
-                                  <Bookmark className="h-3 w-3" />
-                                  <span className="sr-only">Save</span>
+                                  <ThumbsDown className="h-3 w-3" />
                                 </Button>
                               </div>
                             )}
                           </div>
                         </div>
-                      ))}
-                      
-                      {isTyping && (
-                        <div className="flex justify-start">
-                          <div className="bg-muted p-4 rounded-lg">
-                            <div className="flex items-center space-x-2">
-                              <div className="w-2 h-2 rounded-full bg-muted-foreground/70 animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                              <div className="w-2 h-2 rounded-full bg-muted-foreground/70 animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                              <div className="w-2 h-2 rounded-full bg-muted-foreground/70 animate-bounce" style={{ animationDelay: '600ms' }}></div>
-                            </div>
+                      </div>
+                    ))}
+                    
+                    {isTyping && (
+                      <div className="flex justify-start">
+                        <div className="bg-secondary rounded-lg p-3 max-w-[80%]">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                            <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '600ms' }}></div>
                           </div>
                         </div>
-                      )}
-                      
-                      <div ref={messagesEndRef} />
-                    </div>
-                  </ScrollArea>
-                  
-                  <div className="p-4 border-t">
-                    <div className="flex items-end gap-2">
-                      <Button variant="outline" size="icon" className="rounded-full h-10 w-10 flex-shrink-0">
-                        <Paperclip className="h-5 w-5" />
-                        <span className="sr-only">Attach</span>
-                      </Button>
-                      <Button variant="outline" size="icon" className="rounded-full h-10 w-10 flex-shrink-0">
-                        <Image className="h-5 w-5" />
-                        <span className="sr-only">Image</span>
-                      </Button>
-                      <Button variant="outline" size="icon" className="rounded-full h-10 w-10 flex-shrink-0">
-                        <Mic className="h-5 w-5" />
-                        <span className="sr-only">Voice</span>
-                      </Button>
-                      
-                      <div className="relative flex-1">
-                        <Input
-                          id="chat-input"
-                          placeholder="Type your message..."
-                          className="pr-10"
-                          value={input}
-                          onChange={(e) => setInput(e.target.value)}
-                          onKeyDown={handleKeyDown}
-                        />
-                        <Button 
-                          className="absolute right-0 top-0 h-full px-3 rounded-l-none"
-                          onClick={handleSendMessage}
-                          disabled={!input.trim()}
-                        >
-                          <Send className="h-4 w-4" />
-                          <span className="sr-only">Send</span>
-                        </Button>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-              
-              {/* Sidebar with Suggested Questions */}
-              <Card className="lg:col-span-1">
-                <CardHeader>
-                  <CardTitle className="text-lg">Suggested Questions</CardTitle>
-                  <CardDescription>Frequently asked questions</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {suggestedQuestions.map((question, index) => (
-                      <Button 
-                        key={index} 
-                        variant="outline" 
-                        className="w-full justify-start text-sm h-auto py-2"
-                        onClick={() => handleSuggestedQuestion(question)}
-                      >
-                        {question}
-                      </Button>
-                    ))}
-                  </div>
-                  
-                  <div className="mt-6">
-                    <h4 className="font-medium text-sm mb-3">How was your experience?</h4>
-                    <div className="flex gap-2">
-                      <Button variant="outline" className="flex-1">
-                        <ThumbsUp className="mr-2 h-4 w-4" />
-                        Helpful
-                      </Button>
-                      <Button variant="outline" className="flex-1">
-                        <ThumbsDown className="mr-2 h-4 w-4" />
-                        Improve
-                      </Button>
-                    </div>
+                    )}
+                    
+                    {!isTyping && suggestedQuestions.length > 0 && (
+                      <div className="pt-4">
+                        <p className="text-sm font-medium mb-2 flex items-center">
+                          <Lightbulb className="h-4 w-4 mr-1 text-yellow-500" />
+                          Suggested Questions
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {suggestedQuestions.map((question) => (
+                            <Button 
+                              key={question.id} 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleSendMessage(question.text)}
+                              className="text-xs"
+                            >
+                              {question.text}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div ref={messagesEndRef} />
                   </div>
                 </CardContent>
+                
+                <CardFooter className="pt-4 pb-6">
+                  <div className="relative w-full">
+                    <Input
+                      placeholder="Type your message..."
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyPress}
+                      className="pr-12"
+                    />
+                    <Button 
+                      size="sm"
+                      className="absolute right-1 top-1 h-8 w-8 p-0"
+                      onClick={() => handleSendMessage()}
+                      disabled={!input.trim()}
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </CardFooter>
               </Card>
             </div>
           </main>
