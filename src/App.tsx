@@ -14,6 +14,11 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+
+// Feature Pages
+import Attendance from "./pages/features/Attendance";
 
 // Student Pages
 import ViewAttendance from "./pages/attendance/ViewAttendance";
@@ -63,6 +68,11 @@ const App = () => (
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                
+                {/* Feature Pages */}
+                <Route path="/features/attendance" element={<Attendance />} />
                 
                 {/* Student Routes */}
                 <Route path="/attendance/view" element={<ViewAttendance />} />
