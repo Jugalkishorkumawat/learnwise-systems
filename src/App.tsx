@@ -28,15 +28,17 @@ import Students from "./pages/students/Students";
 import StudentProfile from "./pages/students/StudentProfile";
 import AddStudent from "./pages/students/AddStudent";
 import Payments from "./pages/payments/Payments";
-import Facilities from "./pages/facilities/Facilities";
 
 // Facility Management
+import Facilities from "./pages/facilities/Facilities";
 import Library from "./pages/facilities/Library";
 import Hostel from "./pages/facilities/Hostel";
 import ExamResults from "./pages/facilities/ExamResults";
 
 // Shared Pages
 import Chatbot from "./pages/chatbot/Chatbot";
+import PaymentGateway from "./pages/payments/PaymentGateway";
+import StudentData from "./pages/students/StudentData";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,6 +70,8 @@ const App = () => (
                 <Route path="/courses" element={<Courses />} />
                 <Route path="/grades" element={<Grades />} />
                 <Route path="/payments/student" element={<StudentPayments />} />
+                <Route path="/payments/gateway" element={<PaymentGateway />} />
+                <Route path="/student/data" element={<StudentData />} />
                 
                 {/* Teacher/Admin Routes */}
                 <Route path="/attendance/manage" element={<ManageAttendance />} />

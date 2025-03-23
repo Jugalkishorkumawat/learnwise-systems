@@ -1,7 +1,11 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from '@/components/ui-custom/Button';
-import { Search, Filter, Download } from 'lucide-react';
+import { Search, Filter, Download, Calendar } from 'lucide-react';
+import { useState } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 interface AttendanceFiltersProps {
   searchQuery: string;
@@ -9,6 +13,8 @@ interface AttendanceFiltersProps {
   selectedCourse: string;
   onCourseChange: (course: string) => void;
   courses: string[];
+  onDateChange?: (date: Date | undefined) => void;
+  onExport?: () => void;
 }
 
 const AttendanceFilters = ({
@@ -16,8 +22,19 @@ const AttendanceFilters = ({
   onSearchChange,
   selectedCourse,
   onCourseChange,
-  courses
+  courses,
+  onDateChange,
+  onExport
 }: AttendanceFiltersProps) => {
+  const [date, setDate] = useState<Date | undefined>(new Date());
+
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    setDate(selectedDate);
+    if (onDateChange) {
+      onDateChange(selectedDate);
+    }
+  };
+
   return (
     <div className="mb-6 flex flex-col sm:flex-row gap-4">
       <div className="relative flex-1">
@@ -30,7 +47,7 @@ const AttendanceFilters = ({
         />
       </div>
       
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <select
           className="h-10 px-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           value={selectedCourse}
@@ -42,15 +59,36 @@ const AttendanceFilters = ({
           ))}
         </select>
         
+        {onDateChange && (
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">
+                <Calendar className="mr-2 h-4 w-4" />
+                {date ? format(date, "PPP") : "Pick a date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <CalendarComponent
+                mode="single"
+                selected={date}
+                onSelect={handleDateSelect}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        )}
+        
         <Button variant="outline">
           <Filter className="mr-2 h-4 w-4" />
           Filters
         </Button>
         
-        <Button variant="outline">
-          <Download className="mr-2 h-4 w-4" />
-          Export
-        </Button>
+        {onExport && (
+          <Button variant="outline" onClick={onExport}>
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+        )}
       </div>
     </div>
   );
