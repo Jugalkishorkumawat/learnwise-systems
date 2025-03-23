@@ -8,7 +8,7 @@ import { NavItemData } from './NavData';
 export interface NavItemProps {
   label: string;
   href: string;
-  dropdown?: NavItemProps[];
+  dropdown?: NavItemProps[] | NavItemData[];
   activeDropdown: string | null;
   toggleDropdown: (label: string) => void;
   isMobile?: boolean;

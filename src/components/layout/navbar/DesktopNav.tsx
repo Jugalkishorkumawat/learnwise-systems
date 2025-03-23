@@ -16,7 +16,7 @@ const DesktopNav = ({ navItems, activeDropdown, toggleDropdown }: DesktopNavProp
           key={item.label}
           label={item.label}
           href={item.href}
-          dropdown={item.dropdown as NavItemProps[]}
+          dropdown={item.dropdown}
           activeDropdown={activeDropdown}
           toggleDropdown={toggleDropdown}
         />
