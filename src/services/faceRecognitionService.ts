@@ -8,8 +8,11 @@
 
 import { toast } from "@/components/ui/use-toast";
 
-// Define backend URL (should be configured based on environment)
-const FACE_RECOGNITION_API_URL = 'http://localhost:5000';
+// Define backend URL with configurable options
+const FACE_RECOGNITION_API_URL = import.meta.env.VITE_FACE_RECOGNITION_API_URL || 'http://localhost:5000';
+
+// Timeout for fetch requests in milliseconds
+const FETCH_TIMEOUT = 5000;
 
 export interface AttendanceRecord {
   name: string;
@@ -36,7 +39,14 @@ export const FaceRecognitionService = {
    */
   getAttendanceData: async (): Promise<AttendanceRecord[]> => {
     try {
-      const response = await fetch(`${FACE_RECOGNITION_API_URL}/get_attendance`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+      
+      const response = await fetch(`${FACE_RECOGNITION_API_URL}/get_attendance`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error('Failed to fetch attendance data');
@@ -46,11 +56,22 @@ export const FaceRecognitionService = {
       return data as AttendanceRecord[];
     } catch (error) {
       console.error('Error fetching attendance data:', error);
-      toast({
-        title: "Connection Error",
-        description: "Failed to connect to face recognition backend. Please ensure the Python server is running.",
-        variant: "destructive"
-      });
+      
+      if ((error as Error).name === 'AbortError') {
+        console.log('Request timed out');
+        toast({
+          title: "Connection Timeout",
+          description: "Request to face recognition backend timed out. Using simulation mode.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Connection Error",
+          description: "Failed to connect to face recognition backend. Using simulation mode.",
+          variant: "destructive"
+        });
+      }
+      
       return [];
     }
   },
@@ -61,7 +82,14 @@ export const FaceRecognitionService = {
    */
   testConnection: async (): Promise<boolean> => {
     try {
-      const response = await fetch(`${FACE_RECOGNITION_API_URL}/`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+      
+      const response = await fetch(`${FACE_RECOGNITION_API_URL}/`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
       return response.ok;
     } catch (error) {
       console.error('Error connecting to face recognition backend:', error);
@@ -93,6 +121,9 @@ export const FaceRecognitionService = {
    */
   registerFace: async (studentId: string, name: string, imageData: string): Promise<boolean> => {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+      
       const response = await fetch(`${FACE_RECOGNITION_API_URL}/register_face`, {
         method: 'POST',
         headers: {
@@ -103,7 +134,10 @@ export const FaceRecognitionService = {
           name: name,
           image_data: imageData,
         }),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error('Failed to register face');
@@ -128,7 +162,14 @@ export const FaceRecognitionService = {
    */
   exportAttendanceData: async (date: string): Promise<string> => {
     try {
-      const response = await fetch(`${FACE_RECOGNITION_API_URL}/export_attendance?date=${date}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+      
+      const response = await fetch(`${FACE_RECOGNITION_API_URL}/export_attendance?date=${date}`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error('Failed to export attendance data');

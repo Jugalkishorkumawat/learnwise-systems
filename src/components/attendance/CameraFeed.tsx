@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, Camera, CheckCircle, RefreshCcw, User, UserCheck, Video } from 'lucide-react';
 import FaceRecognitionService, { AttendanceRecord } from '@/services/faceRecognitionService';
 import { toast } from "@/components/ui/use-toast";
+import appConfig from '@/config/appConfig';
 
 interface CameraFeedProps {
   isActive: boolean;
@@ -18,6 +19,7 @@ const CameraFeed = ({ isActive, onStatusChange }: CameraFeedProps) => {
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [recentDetections, setRecentDetections] = useState<AttendanceRecord[]>([]);
   const [detectionCount, setDetectionCount] = useState(0);
+  const [isSimulationMode, setIsSimulationMode] = useState(appConfig.enableSimulationMode);
 
   // Test connection to Python backend
   useEffect(() => {
@@ -31,6 +33,7 @@ const CameraFeed = ({ isActive, onStatusChange }: CameraFeedProps) => {
             setConnectionStatus('connected');
             setStreamUrl(FaceRecognitionService.startCameraStream());
             onStatusChange('scanning');
+            setIsSimulationMode(false);
             toast({
               title: "Face Recognition Connected",
               description: "Successfully connected to the face recognition system.",
@@ -38,9 +41,10 @@ const CameraFeed = ({ isActive, onStatusChange }: CameraFeedProps) => {
           } else {
             setConnectionStatus('error');
             onStatusChange('error');
+            setIsSimulationMode(true);
             toast({
               title: "Connection Failed",
-              description: "Could not connect to face recognition system. Please check if the Python server is running.",
+              description: "Could not connect to face recognition system. Using simulation mode instead.",
               variant: "destructive"
             });
           }
@@ -48,6 +52,7 @@ const CameraFeed = ({ isActive, onStatusChange }: CameraFeedProps) => {
           console.error('Error connecting to face recognition system:', error);
           setConnectionStatus('error');
           onStatusChange('error');
+          setIsSimulationMode(true);
         }
       } else {
         // System not active
@@ -61,21 +66,23 @@ const CameraFeed = ({ isActive, onStatusChange }: CameraFeedProps) => {
 
   // Fetch attendance data at regular intervals
   useEffect(() => {
-    if (!isActive || connectionStatus !== 'connected') {
+    if (!isActive || (connectionStatus !== 'connected' && !isSimulationMode)) {
       return;
     }
 
     const fetchAttendanceData = async () => {
       try {
-        const data = await FaceRecognitionService.getAttendanceData();
-        
-        // Update recent detections (last 5)
-        setRecentDetections(data.slice(0, 5));
-        setDetectionCount(data.length);
-        
-        // If we have detections, make sure status is set to scanning
-        if (data.length > 0) {
-          onStatusChange('scanning');
+        if (connectionStatus === 'connected') {
+          const data = await FaceRecognitionService.getAttendanceData();
+          
+          // Update recent detections (last 5)
+          setRecentDetections(data.slice(0, 5));
+          setDetectionCount(data.length);
+          
+          // If we have detections, make sure status is set to scanning
+          if (data.length > 0) {
+            onStatusChange('scanning');
+          }
         }
       } catch (error) {
         console.error('Error fetching attendance data:', error);
@@ -87,11 +94,11 @@ const CameraFeed = ({ isActive, onStatusChange }: CameraFeedProps) => {
     const interval = setInterval(fetchAttendanceData, 5000);
     
     return () => clearInterval(interval);
-  }, [isActive, connectionStatus, onStatusChange]);
+  }, [isActive, connectionStatus, onStatusChange, isSimulationMode]);
 
   // Simulate face recognition for demo purposes (when no actual Python backend)
   useEffect(() => {
-    if (!isActive || connectionStatus !== 'error') {
+    if (!isActive || !isSimulationMode) {
       return;
     }
 
@@ -123,7 +130,7 @@ const CameraFeed = ({ isActive, onStatusChange }: CameraFeedProps) => {
     }, 8000 + Math.random() * 7000);
     
     return () => clearInterval(simulationInterval);
-  }, [isActive, connectionStatus, onStatusChange]);
+  }, [isActive, isSimulationMode, onStatusChange]);
 
   const handleRetryConnection = async () => {
     setConnectionStatus('connecting');
@@ -135,6 +142,7 @@ const CameraFeed = ({ isActive, onStatusChange }: CameraFeedProps) => {
         setConnectionStatus('connected');
         setStreamUrl(FaceRecognitionService.startCameraStream());
         onStatusChange('scanning');
+        setIsSimulationMode(false);
         toast({
           title: "Connection Restored",
           description: "Successfully reconnected to the face recognition system.",
@@ -142,6 +150,7 @@ const CameraFeed = ({ isActive, onStatusChange }: CameraFeedProps) => {
       } else {
         setConnectionStatus('error');
         onStatusChange('error');
+        setIsSimulationMode(true);
         toast({
           title: "Reconnection Failed",
           description: "Could not reconnect to face recognition system. The simulation mode will be used instead.",
@@ -152,6 +161,7 @@ const CameraFeed = ({ isActive, onStatusChange }: CameraFeedProps) => {
       console.error('Error reconnecting:', error);
       setConnectionStatus('error');
       onStatusChange('error');
+      setIsSimulationMode(true);
     }
   };
 
@@ -176,7 +186,7 @@ const CameraFeed = ({ isActive, onStatusChange }: CameraFeedProps) => {
         return (
           <Badge className="bg-red-100 text-red-800">
             <AlertCircle className="h-3 w-3 mr-1" />
-            Connection Error
+            {isSimulationMode ? "Simulation Mode" : "Connection Error"}
           </Badge>
         );
     }
@@ -301,7 +311,7 @@ const CameraFeed = ({ isActive, onStatusChange }: CameraFeedProps) => {
           <p>
             Face recognition is actively running. Students are automatically being marked present.
           </p>
-        ) : connectionStatus === 'error' ? (
+        ) : isSimulationMode ? (
           <p>
             Using simulated face detection. Connect the Python backend for actual face recognition.
           </p>
