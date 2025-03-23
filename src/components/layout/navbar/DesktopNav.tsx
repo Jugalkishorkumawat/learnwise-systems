@@ -1,8 +1,9 @@
 
 import { NavItem, NavItemProps } from './NavItem';
+import { NavItemData } from './NavData';
 
 interface DesktopNavProps {
-  navItems: Omit<NavItemProps, 'activeDropdown' | 'toggleDropdown'>[];
+  navItems: NavItemData[];
   activeDropdown: string | null;
   toggleDropdown: (label: string) => void;
 }
@@ -15,7 +16,7 @@ const DesktopNav = ({ navItems, activeDropdown, toggleDropdown }: DesktopNavProp
           key={item.label}
           label={item.label}
           href={item.href}
-          dropdown={item.dropdown}
+          dropdown={item.dropdown as NavItemProps[]}
           activeDropdown={activeDropdown}
           toggleDropdown={toggleDropdown}
         />

@@ -2,9 +2,10 @@
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { NavItem, NavItemProps } from './NavItem';
+import { NavItemData } from './NavData';
 
 interface MobileNavProps {
-  navItems: Omit<NavItemProps, 'activeDropdown' | 'toggleDropdown'>[];
+  navItems: NavItemData[];
   activeDropdown: string | null;
   toggleDropdown: (label: string) => void;
   isMobileMenuOpen: boolean;
@@ -25,7 +26,7 @@ const MobileNav = ({ navItems, activeDropdown, toggleDropdown, isMobileMenuOpen 
             key={item.label}
             label={item.label}
             href={item.href}
-            dropdown={item.dropdown}
+            dropdown={item.dropdown as NavItemProps[]}
             activeDropdown={activeDropdown}
             toggleDropdown={toggleDropdown}
             isMobile={true}
