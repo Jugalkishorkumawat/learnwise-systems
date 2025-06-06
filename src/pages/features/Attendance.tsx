@@ -1,7 +1,7 @@
 
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Camera, CheckCircle, CheckSquare, BarChart4 } from 'lucide-react';
+import { CheckSquare, Users, BarChart4, Clock, FileText, Calendar } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/layout/PageTransition';
@@ -25,10 +25,10 @@ const Attendance = () => {
                   Feature Spotlight
                 </div>
                 <h1 className="text-4xl font-bold mb-6">
-                  AI-Powered Attendance System
+                  Smart Attendance Management System
                 </h1>
                 <p className="text-lg text-muted-foreground mb-8">
-                  Revolutionize attendance tracking with our facial recognition technology that works with your existing CCTV infrastructure.
+                  Streamline attendance tracking with our comprehensive digital system designed for schools and colleges. Easy manual marking with real-time analytics.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link to="/register">
@@ -49,11 +49,11 @@ const Attendance = () => {
                 <div className="aspect-video bg-primary/5 rounded-xl overflow-hidden shadow-lg flex items-center justify-center">
                   <div className="text-center p-8">
                     <div className="flex justify-center">
-                      <Camera className="h-16 w-16 text-primary mb-4" />
+                      <Users className="h-16 w-16 text-primary mb-4" />
                     </div>
-                    <h3 className="text-xl font-bold mb-2">Facial Recognition Demo</h3>
-                    <p className="text-muted-foreground mb-4">See how our AI attendance system works</p>
-                    <Button>Watch Demo</Button>
+                    <h3 className="text-xl font-bold mb-2">Digital Attendance System</h3>
+                    <p className="text-muted-foreground mb-4">See how our attendance management works</p>
+                    <Button>View Demo</Button>
                   </div>
                 </div>
                 
@@ -78,19 +78,34 @@ const Attendance = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
                 {
-                  icon: <Camera className="h-8 w-8 text-primary" />,
-                  title: "Facial Recognition",
-                  description: "Leverage existing CCTV infrastructure to automatically recognize students and mark attendance."
+                  icon: <CheckSquare className="h-8 w-8 text-primary" />,
+                  title: "Manual Attendance Marking",
+                  description: "Quick and easy manual attendance marking with intuitive interface for teachers and administrators."
                 },
                 {
-                  icon: <CheckSquare className="h-8 w-8 text-primary" />,
-                  title: "Manual Override",
-                  description: "Teachers can easily make manual adjustments when necessary."
+                  icon: <Calendar className="h-8 w-8 text-primary" />,
+                  title: "Real-time Updates",
+                  description: "Instant attendance updates with real-time synchronization across all devices and platforms."
                 },
                 {
                   icon: <BarChart4 className="h-8 w-8 text-primary" />,
-                  title: "Real-time Analytics",
-                  description: "Access attendance trends and insights with comprehensive reports."
+                  title: "Analytics & Reports",
+                  description: "Comprehensive attendance analytics with detailed reports and trend analysis."
+                },
+                {
+                  icon: <Clock className="h-8 w-8 text-primary" />,
+                  title: "Flexible Scheduling",
+                  description: "Support for multiple class schedules, periods, and custom attendance policies."
+                },
+                {
+                  icon: <FileText className="h-8 w-8 text-primary" />,
+                  title: "Export & Documentation",
+                  description: "Export attendance data in multiple formats for documentation and regulatory compliance."
+                },
+                {
+                  icon: <Users className="h-8 w-8 text-primary" />,
+                  title: "Student Management",
+                  description: "Complete student profile management with attendance history and performance tracking."
                 },
               ].map((feature, index) => (
                 <motion.div
@@ -118,7 +133,7 @@ const Attendance = () => {
             <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="text-3xl font-bold mb-4">How It Works</h2>
               <p className="text-lg text-muted-foreground">
-                Our attendance system integrates seamlessly with your existing infrastructure
+                Simple and efficient attendance management process
               </p>
             </div>
             
@@ -126,23 +141,23 @@ const Attendance = () => {
               {[
                 {
                   step: 1,
-                  title: "Integration with Existing Cameras",
-                  description: "Our system connects to your existing CCTV cameras, eliminating the need for additional hardware installation."
+                  title: "Student Registration",
+                  description: "Register students with complete profiles including contact information, department, and academic details."
                 },
                 {
                   step: 2,
-                  title: "Facial Recognition Enrollment",
-                  description: "Students register their faces securely through a one-time process that stores encrypted facial data."
+                  title: "Course & Schedule Setup",
+                  description: "Create courses, assign instructors, and set up class schedules for organized attendance tracking."
                 },
                 {
                   step: 3,
-                  title: "Automated Attendance Marking",
-                  description: "As students enter the classroom, their faces are recognized and attendance is marked automatically."
+                  title: "Daily Attendance Marking",
+                  description: "Teachers mark attendance manually through an intuitive interface with options for present, absent, or late status."
                 },
                 {
                   step: 4,
-                  title: "Analytics & Reporting",
-                  description: "Generate comprehensive attendance reports for students, classes, and departments with just a few clicks."
+                  title: "Real-time Analytics",
+                  description: "Generate comprehensive attendance reports with insights into student performance and attendance patterns."
                 },
               ].map((item, index) => (
                 <motion.div
@@ -182,7 +197,7 @@ const Attendance = () => {
                 Ready to transform your attendance process?
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                Join hundreds of educational institutions already using our AI-powered attendance system.
+                Join hundreds of educational institutions already using our comprehensive attendance management system.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link to="/register">

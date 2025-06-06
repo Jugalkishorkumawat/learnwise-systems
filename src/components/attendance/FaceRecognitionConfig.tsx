@@ -4,51 +4,53 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui-custom/Button';
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, CameraOff, Upload, Download, RefreshCcw } from 'lucide-react';
+import { Settings, Download, Upload, RefreshCcw, Bell, Users } from 'lucide-react';
 import { toast } from "@/components/ui/use-toast";
 
-interface FaceRecognitionConfigProps {
+interface SystemConfigProps {
   isEnabled: boolean;
   onToggle: (enabled: boolean) => void;
 }
 
-const FaceRecognitionConfig = ({ isEnabled, onToggle }: FaceRecognitionConfigProps) => {
-  const [sensitivity, setSensitivity] = React.useState([75]);
-  const [recognitionModel, setRecognitionModel] = React.useState("facenet");
+const SystemConfig = ({ isEnabled, onToggle }: SystemConfigProps) => {
+  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+  const [autoSaveInterval, setAutoSaveInterval] = React.useState("5");
   
-  const handleModelChange = (value: string) => {
-    setRecognitionModel(value);
+  const handleNotificationToggle = (enabled: boolean) => {
+    setNotificationsEnabled(enabled);
     toast({
-      title: "Model Changed",
-      description: `Recognition model changed to ${value.toUpperCase()}.`,
+      title: "Notifications Updated",
+      description: `Notifications have been ${enabled ? 'enabled' : 'disabled'}.`,
     });
   };
   
-  const handleSensitivityChange = (value: number[]) => {
-    setSensitivity(value);
+  const handleAutoSaveChange = (value: string) => {
+    setAutoSaveInterval(value);
+    toast({
+      title: "Auto-save Updated",
+      description: `Auto-save interval set to ${value} minutes.`,
+    });
   };
   
   const handleExportData = () => {
     toast({
-      title: "Attendance Data Exported",
-      description: "Attendance data has been exported to CSV file.",
+      title: "Export Started",
+      description: "System data export has been initiated.",
     });
   };
   
-  const handleUploadFaces = () => {
+  const handleImportData = () => {
     toast({
-      title: "Feature Not Available",
-      description: "This feature requires connection to the Python backend.",
-      variant: "destructive"
+      title: "Import Ready",
+      description: "Please select a file to import student data.",
     });
   };
   
   const handleResetSystem = () => {
     toast({
       title: "System Reset",
-      description: "Face recognition system has been reset.",
+      description: "All temporary data has been cleared.",
     });
   };
   
@@ -57,10 +59,10 @@ const FaceRecognitionConfig = ({ isEnabled, onToggle }: FaceRecognitionConfigPro
       <CardHeader>
         <CardTitle className="flex items-center">
           <Settings className="mr-2 h-5 w-5 text-primary" />
-          Face Recognition Configuration
+          System Configuration
         </CardTitle>
         <CardDescription>
-          Configure and fine-tune the face recognition system
+          Configure attendance system settings and preferences
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -68,58 +70,58 @@ const FaceRecognitionConfig = ({ isEnabled, onToggle }: FaceRecognitionConfigPro
           {/* Main Toggle */}
           <div className="flex items-center justify-between">
             <div>
-              <Label htmlFor="face-recognition-toggle" className="text-base font-medium">
-                Face Recognition System
+              <Label htmlFor="system-toggle" className="text-base font-medium">
+                Attendance System
               </Label>
               <p className="text-sm text-muted-foreground">
-                Enable or disable automatic face recognition
+                Enable or disable the attendance management system
               </p>
             </div>
             <Switch 
-              id="face-recognition-toggle" 
+              id="system-toggle" 
               checked={isEnabled} 
               onCheckedChange={onToggle} 
             />
           </div>
           
-          {/* Model Selection */}
+          {/* Notifications */}
+          <div className="flex items-center justify-between">
+            <div>
+              <Label htmlFor="notifications-toggle" className="text-base font-medium">
+                Notifications
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Receive alerts for attendance updates
+              </p>
+            </div>
+            <Switch 
+              id="notifications-toggle" 
+              checked={notificationsEnabled} 
+              onCheckedChange={handleNotificationToggle}
+              disabled={!isEnabled}
+            />
+          </div>
+          
+          {/* Auto-save Interval */}
           <div className="grid gap-2">
-            <Label htmlFor="recognition-model">Recognition Model</Label>
+            <Label htmlFor="auto-save">Auto-save Interval</Label>
             <Select 
-              value={recognitionModel} 
-              onValueChange={handleModelChange}
+              value={autoSaveInterval} 
+              onValueChange={handleAutoSaveChange}
               disabled={!isEnabled}
             >
-              <SelectTrigger id="recognition-model">
-                <SelectValue placeholder="Select model" />
+              <SelectTrigger id="auto-save">
+                <SelectValue placeholder="Select interval" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="facenet">FaceNet (Default)</SelectItem>
-                <SelectItem value="dlib">Dlib HOG</SelectItem>
-                <SelectItem value="opencv">OpenCV Haar Cascade</SelectItem>
+                <SelectItem value="1">1 minute</SelectItem>
+                <SelectItem value="5">5 minutes</SelectItem>
+                <SelectItem value="10">10 minutes</SelectItem>
+                <SelectItem value="30">30 minutes</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              FaceNet provides the best accuracy but may be slower on some systems
-            </p>
-          </div>
-          
-          {/* Sensitivity Slider */}
-          <div className="grid gap-2">
-            <div className="flex items-center justify-between">
-              <Label>Recognition Sensitivity</Label>
-              <span className="text-sm font-medium">{sensitivity[0]}%</span>
-            </div>
-            <Slider 
-              value={sensitivity} 
-              min={1} 
-              max={100} 
-              step={1} 
-              onValueChange={handleSensitivityChange}
-              disabled={!isEnabled}
-            />
-            <p className="text-xs text-muted-foreground">
-              Higher sensitivity may lead to more false positives
+              How often attendance data should be automatically saved
             </p>
           </div>
           
@@ -128,11 +130,11 @@ const FaceRecognitionConfig = ({ isEnabled, onToggle }: FaceRecognitionConfigPro
             <Button 
               variant="outline" 
               className="h-9" 
-              onClick={handleUploadFaces}
+              onClick={handleImportData}
               disabled={!isEnabled}
             >
               <Upload className="h-4 w-4 mr-2" />
-              Upload Face Data
+              Import Data
             </Button>
             <Button 
               variant="outline" 
@@ -140,7 +142,7 @@ const FaceRecognitionConfig = ({ isEnabled, onToggle }: FaceRecognitionConfigPro
               onClick={handleExportData}
             >
               <Download className="h-4 w-4 mr-2" />
-              Export Attendance
+              Export Data
             </Button>
           </div>
           
@@ -151,8 +153,8 @@ const FaceRecognitionConfig = ({ isEnabled, onToggle }: FaceRecognitionConfigPro
               onClick={() => onToggle(false)}
               disabled={!isEnabled}
             >
-              <CameraOff className="h-4 w-4 mr-2" />
-              Stop Recognition
+              <Users className="h-4 w-4 mr-2" />
+              Stop System
             </Button>
             <Button 
               variant="outline" 
@@ -161,7 +163,7 @@ const FaceRecognitionConfig = ({ isEnabled, onToggle }: FaceRecognitionConfigPro
               disabled={!isEnabled}
             >
               <RefreshCcw className="h-4 w-4 mr-2" />
-              Reset System
+              Clear Cache
             </Button>
           </div>
         </div>
@@ -170,4 +172,4 @@ const FaceRecognitionConfig = ({ isEnabled, onToggle }: FaceRecognitionConfigPro
   );
 };
 
-export default FaceRecognitionConfig;
+export default SystemConfig;
