@@ -8,15 +8,37 @@ export interface NavItemData {
 export const navItems: NavItemData[] = [
   { label: 'Home', href: '/' },
   {
-    label: 'Features',
+    label: 'Academic',
     href: '#',
     dropdown: [
-      { label: 'Attendance System', href: '/features/attendance' },
-      { label: 'Fee Management', href: '/features/fees' },
-      { label: 'Facilities', href: '/features/facilities' },
-      { label: 'AI Chatbot', href: '/features/chatbot' }
+      { label: 'Students', href: '/students' },
+      { label: 'Staff Management', href: '/staff' },
+      { label: 'Courses', href: '/courses' },
+      { label: 'Timetable', href: '/timetable' },
+      { label: 'Examinations', href: '/facilities/exams' }
     ]
   },
+  {
+    label: 'Management',
+    href: '#',
+    dropdown: [
+      { label: 'Attendance System', href: '/attendance/manage' },
+      { label: 'Fee Management', href: '/payments' },
+      { label: 'Notice Board', href: '/notices' },
+      { label: 'Reports', href: '/reports' }
+    ]
+  },
+  {
+    label: 'Facilities',
+    href: '#',
+    dropdown: [
+      { label: 'Library', href: '/facilities/library' },
+      { label: 'Hostel', href: '/facilities/hostel' },
+      { label: 'Transport', href: '/transport' },
+      { label: 'All Facilities', href: '/facilities' }
+    ]
+  },
+  { label: 'Dashboard', href: '/comprehensive-dashboard' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' }
 ];

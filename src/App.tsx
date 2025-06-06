@@ -13,6 +13,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import ComprehensiveDashboard from "./pages/ComprehensiveDashboard";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -33,6 +34,15 @@ import Students from "./pages/students/Students";
 import StudentProfile from "./pages/students/StudentProfile";
 import AddStudent from "./pages/students/AddStudent";
 import Payments from "./pages/payments/Payments";
+
+// Staff Management
+import Staff from "./pages/staff/Staff";
+
+// Academic Management
+import Timetable from "./pages/timetable/Timetable";
+
+// Notice Board
+import Notices from "./pages/notices/Notices";
 
 // Facility Management
 import Facilities from "./pages/facilities/Facilities";
@@ -68,6 +78,7 @@ const App = () => (
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/comprehensive-dashboard" element={<ComprehensiveDashboard />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 
@@ -90,6 +101,15 @@ const App = () => (
                 <Route path="/students/:id" element={<StudentProfile />} />
                 <Route path="/students/:id/edit" element={<StudentProfile />} />
                 <Route path="/payments" element={<Payments />} />
+                
+                {/* Staff Management Routes */}
+                <Route path="/staff" element={<Staff />} />
+                
+                {/* Academic Management Routes */}
+                <Route path="/timetable" element={<Timetable />} />
+                
+                {/* Notice Board Routes */}
+                <Route path="/notices" element={<Notices />} />
                 
                 {/* Facility Management Routes */}
                 <Route path="/facilities" element={<Facilities />} />
