@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '@/components/layout/Sidebar';
@@ -42,7 +41,6 @@ import {
   Library,
   Monitor,
   Wallet,
-  UserGraduate,
   Activity,
   Newspaper,
   PlayCircle,
@@ -392,7 +390,7 @@ const ComprehensiveDashboard = () => {
     { 
       title: "Semester Registration", 
       description: "Course registration for semester",
-      icon: UserGraduate,
+      icon: GraduationCap,
       route: "/semester-registration",
       color: "border-blue-200 hover:border-blue-400 hover:shadow-blue-100",
       bgGradient: "from-blue-50 to-blue-100"
