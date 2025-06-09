@@ -55,6 +55,82 @@ import Chatbot from "./pages/chatbot/Chatbot";
 import PaymentGateway from "./pages/payments/PaymentGateway";
 import StudentData from "./pages/students/StudentData";
 
+// New Feature Pages - Academic & Learning
+import Profile from "./pages/features/Profile";
+import AcademicAnalysis from "./pages/features/AcademicAnalysis";
+import Results from "./pages/features/Results";
+import Activity from "./pages/features/Activity";
+import Assignments from "./pages/features/Assignments";
+import Homeworks from "./pages/features/Homeworks";
+
+// Calendar & Scheduling
+import CollegeCalendar from "./pages/features/CollegeCalendar";
+
+// Financial
+import Accounts from "./pages/features/Accounts";
+import Wallet from "./pages/features/Wallet";
+
+// Information & Communication
+import CentralizedInfo from "./pages/features/CentralizedInfo";
+import Circulars from "./pages/features/Circulars";
+
+// Academic Services
+import CertificateScholarship from "./pages/features/CertificateScholarship";
+import MyClubs from "./pages/features/MyClubs";
+
+// Student Services
+import Counselling from "./pages/features/Counselling";
+import Grievance from "./pages/features/Grievance";
+
+// Vision & Mission
+import DepartmentVision from "./pages/features/DepartmentVision";
+import DepartmentMission from "./pages/features/DepartmentMission";
+
+// Digital Resources
+import DigitalLibrary from "./pages/features/DigitalLibrary";
+import StudyMaterials from "./pages/features/StudyMaterials";
+import Tutorials from "./pages/features/Tutorials";
+
+// Administrative
+import DutyLeave from "./pages/features/DutyLeave";
+
+// Examinations
+import ExamSchedule from "./pages/features/ExamSchedule";
+import ExamQuiz from "./pages/features/ExamQuiz";
+import ModuleTest from "./pages/features/ModuleTest";
+import QuestionBank from "./pages/features/QuestionBank";
+import SeriesExam from "./pages/features/SeriesExam";
+import EndSemesterExam from "./pages/features/EndSemesterExam";
+
+// Laboratory
+import Laboratory from "./pages/features/Laboratory";
+
+// Live & Online Learning
+import Live from "./pages/features/Live";
+import OnlineVideoClass from "./pages/features/OnlineVideoClass";
+import VideoLectures from "./pages/features/VideoLectures";
+
+// MOOC
+import MoocRegistration from "./pages/features/MoocRegistration";
+
+// Career
+import Placements from "./pages/features/Placements";
+
+// Registration
+import SemesterRegistration from "./pages/features/SemesterRegistration";
+import SubjectRegistration from "./pages/features/SubjectRegistration";
+
+// Academic Programs
+import ProgramOutcomes from "./pages/features/ProgramOutcomes";
+import Subject from "./pages/features/Subject";
+
+// Feedback
+import Survey from "./pages/features/Survey";
+import Remarks from "./pages/features/Remarks";
+
+// Staff
+import Teacher from "./pages/features/Teacher";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -119,6 +195,82 @@ const App = () => (
                 
                 {/* Shared Routes */}
                 <Route path="/chatbot" element={<Chatbot />} />
+                
+                {/* New Feature Routes - Academic & Learning */}
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/academic-analysis" element={<AcademicAnalysis />} />
+                <Route path="/results" element={<Results />} />
+                <Route path="/activity" element={<Activity />} />
+                <Route path="/assignments" element={<Assignments />} />
+                <Route path="/homeworks" element={<Homeworks />} />
+                
+                {/* Calendar & Scheduling */}
+                <Route path="/college-calendar" element={<CollegeCalendar />} />
+                
+                {/* Financial */}
+                <Route path="/accounts" element={<Accounts />} />
+                <Route path="/wallet" element={<Wallet />} />
+                
+                {/* Information & Communication */}
+                <Route path="/centralized-info" element={<CentralizedInfo />} />
+                <Route path="/circulars" element={<Circulars />} />
+                
+                {/* Academic Services */}
+                <Route path="/certificate-scholarship" element={<CertificateScholarship />} />
+                <Route path="/my-clubs" element={<MyClubs />} />
+                
+                {/* Student Services */}
+                <Route path="/counselling" element={<Counselling />} />
+                <Route path="/grievance" element={<Grievance />} />
+                
+                {/* Vision & Mission */}
+                <Route path="/department-vision" element={<DepartmentVision />} />
+                <Route path="/department-mission" element={<DepartmentMission />} />
+                
+                {/* Digital Resources */}
+                <Route path="/digital-library" element={<DigitalLibrary />} />
+                <Route path="/study-materials" element={<StudyMaterials />} />
+                <Route path="/tutorials" element={<Tutorials />} />
+                
+                {/* Administrative */}
+                <Route path="/duty-leave" element={<DutyLeave />} />
+                
+                {/* Examinations */}
+                <Route path="/exam-schedule" element={<ExamSchedule />} />
+                <Route path="/exam-quiz" element={<ExamQuiz />} />
+                <Route path="/module-test" element={<ModuleTest />} />
+                <Route path="/question-bank" element={<QuestionBank />} />
+                <Route path="/series-exam" element={<SeriesExam />} />
+                <Route path="/end-semester-exam" element={<EndSemesterExam />} />
+                
+                {/* Laboratory */}
+                <Route path="/laboratory" element={<Laboratory />} />
+                
+                {/* Live & Online Learning */}
+                <Route path="/live" element={<Live />} />
+                <Route path="/online-video-class" element={<OnlineVideoClass />} />
+                <Route path="/video-lectures" element={<VideoLectures />} />
+                
+                {/* MOOC */}
+                <Route path="/mooc-registration" element={<MoocRegistration />} />
+                
+                {/* Career */}
+                <Route path="/placements" element={<Placements />} />
+                
+                {/* Registration */}
+                <Route path="/semester-registration" element={<SemesterRegistration />} />
+                <Route path="/subject-registration" element={<SubjectRegistration />} />
+                
+                {/* Academic Programs */}
+                <Route path="/program-outcomes" element={<ProgramOutcomes />} />
+                <Route path="/subject" element={<Subject />} />
+                
+                {/* Feedback */}
+                <Route path="/survey" element={<Survey />} />
+                <Route path="/remarks" element={<Remarks />} />
+                
+                {/* Staff */}
+                <Route path="/teacher" element={<Teacher />} />
                 
                 {/* Catch All */}
                 <Route path="*" element={<NotFound />} />
